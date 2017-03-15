@@ -1,0 +1,5 @@
+library(markdown)
+library(RPostgreSQL)
+library(shiny)
+library(shinydashboard)
+library(ggplot2)
