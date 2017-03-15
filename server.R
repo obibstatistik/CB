@@ -4,7 +4,7 @@ shinyServer(function(input, output) {
 
   source("~/.postpass")
   drv <- dbDriver("PostgreSQL")
-  con <- dbConnect(drv, dbname = dbname, host = host, port = port, user = user, password = pw)
+  con <- dbConnect(drv, dbname = dbname, host = host, port = port, user = user, password = password)
   
   levtidmat <- dbGetQuery(con, "SELECT * FROM datamart.accession_lev_tid_mat")
   levtidres <- dbGetQuery(con, "SELECT * FROM datamart.accession_lev_tid_res where r_pr_e > 3")

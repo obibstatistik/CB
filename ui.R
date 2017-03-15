@@ -1,7 +1,7 @@
 source("global.R")
 source("~/.postpass")
 drv <- dbDriver("PostgreSQL")
-con <- dbConnect(drv, dbname = dbname, host = host, port = port, user = user, password = pw)
+con <- dbConnect(drv, dbname = dbname, host = host, port = port, user = user, password = password)
 
 levtidbes_cat <- dbGetQuery(con, "select distinct cat from datamart.accession_lev_tid_bes")
 levtidmat_vnd <- dbGetQuery(con, "select distinct vndcustomerid from datamart.accession_lev_tid_mat")
