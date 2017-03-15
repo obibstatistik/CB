@@ -1,3 +1,5 @@
+source("global.R")
+
 shinyServer(function(input, output) {
 
   source("~/.postpass")
