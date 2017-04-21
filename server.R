@@ -90,8 +90,26 @@ shinyServer(function(input, output) {
     pie(slices, labels = lbls)
   })
   
-  # bestillinger  
+  ### ORDERS ###  
   
+  # count rows i dataframe #
+  
+  output$ordersresult <- renderText ({
+    data <- levtidbes
+    if (input$year != "All") {
+      data <- data[data$year == input$year,]
+    }
+    if (input$cat != "All") {
+      data <- data[data$cat == input$cat,]
+    }
+    if (input$week != "All") {
+      data <- data[data$week == input$week,]
+    }
+    data <- count(data)
+    data <- toString(data)
+  })
+  
+  # 
   
   output$plotbes <- renderPlot({
     data <- levtidbes
@@ -101,7 +119,10 @@ shinyServer(function(input, output) {
     if (input$cat != "All") {
       data <- data[data$cat == input$cat,]
     }
-    slices <- c(sum(data$time < '1 day'), sum(data$time < '1 day' & data$time < '2 day'), sum(data$time < '2 day'))
+    if (input$week != "All") {
+      data <- data[data$week == input$week,]
+    }
+    slices <- c(sum(data$days == 0), sum(data$days == 1, sum(data$days > 1)))
     lbls <- c("1 dag", "2 dage", "over 2 dage")
     pct <- round(slices/sum(slices)*100)
     lbls <- paste(lbls, pct) # add percents to labels 
@@ -109,15 +130,13 @@ shinyServer(function(input, output) {
     pie(slices, labels = lbls, main="Leveringsdage")
   })
   
-  output$plotbes2 <- renderPlot({
-    data <- levtidbes
-    ggplot(data, aes(x= data$days)) + geom_freqpoly(bins = 365) + xlim(0, 365)
-  })
-  
   output$tablebes <- DT::renderDataTable(DT::datatable({
     data <- levtidbes
     if (input$year != "All") {
       data <- data[data$year == input$year,]
+    }
+    if (input$week != "All") {
+      data <- data[data$week == input$week,]
     }
     if (input$cat != "All") {
       data <- data[data$cat == input$cat,]
@@ -127,6 +146,7 @@ shinyServer(function(input, output) {
   },
     class = 'cell-border stripe',
     rownames = FALSE,
-    colnames = c('År', 'Resno', 'Cat', 'Bestil','Lev','Tid','Dage')))
+    options = list(pageLength = 100, dom = 'tip'),
+    colnames = c('År', 'Uge','Resno', 'Cat', 'Bestil','Lev','Tid','Dage')))
   
 })

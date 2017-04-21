@@ -43,11 +43,11 @@ and ((txt.imat != 'vd' and txt.imat != 'lc') or txt.imat IS NULL)
 group by title, resitem.keyno,eksemplarer,lang
 order by R_pr_E desc;
 
-/* leveringstid for ikke udlånte materialer*/
+/* leveringstid for ikke udlånte materialer */
 
 drop table if exists datamart.accession_lev_tid_bes;
 select * into datamart.accession_lev_tid_bes from (
-select cast('2017' as integer) as year, stat2017.resno, stat2017.cat, stat2017.stdate as stdate28, nested.stdate as stdate43, (nested.stdate-stat2017.stdate) as time, EXTRACT(epoch FROM (nested.stdate-stat2017.stdate))/3600 as days from stat2017
+select cast('2017' as integer) as year, extract(week from stat2017.stdate) as week, stat2017.resno, stat2017.cat, stat2017.stdate as stdate28, nested.stdate as stdate43, (nested.stdate-stat2017.stdate) as hours, nested.stdate::date - stat2017.stdate::date as days from stat2017
 join 
   (select * 
   from stat2017 
@@ -55,7 +55,7 @@ join
   ) as nested on nested.resno = stat2017.resno 
 where stat2017.type = '28' and stat2017.dep in ('ocv','ocb') and stat2017.cat not in ('vm','vo','pe','bo','bm')
 union
-select cast('2016' as integer) as year, stat2016.resno, stat2016.cat, stat2016.stdate as stdate28, nested.stdate as stdate43, (nested.stdate-stat2016.stdate) as time, EXTRACT(epoch FROM (nested.stdate-stat2016.stdate))/3600 as days from stat2016
+select cast('2016' as integer) as year, extract(week from stat2016.stdate) as week, stat2016.resno, stat2016.cat, stat2016.stdate as stdate28, nested.stdate as stdate43, (nested.stdate-stat2016.stdate) as hours, nested.stdate::date - stat2016.stdate::date as days from stat2016
 join 
   (select * 
   from stat2016 
@@ -63,11 +63,13 @@ join
   ) as nested on nested.resno = stat2016.resno 
 where stat2016.type = '28' and stat2016.dep in ('ocv','ocb') and stat2016.cat not in ('vm','vo','pe','bo','bm')
 union
-select cast('2015' as integer) as year, stat2015.resno, stat2015.cat, stat2015.stdate as stdate28, nested.stdate as stdate43, (nested.stdate-stat2015.stdate) as time, EXTRACT(epoch FROM (nested.stdate-stat2015.stdate))/3600 as days from stat2015
+select cast('2015' as integer) as year, extract(week from stat2015.stdate) as week, stat2015.resno, stat2015.cat, stat2015.stdate as stdate28, nested.stdate as stdate43, (nested.stdate-stat2015.stdate) as hours, nested.stdate::date - stat2015.stdate::date as days from stat2015
 join 
   (select * 
   from stat2015 
   where type = '43' and dep in ('ocv','ocb')
   ) as nested on nested.resno = stat2015.resno 
 where stat2015.type = '28' and stat2015.dep in ('ocv','ocb') and stat2015.cat not in ('vm','vo','pe','bo','bm')
-order by year, time) as test; 
+order by year, hours) as test; 
+
+

@@ -3,7 +3,7 @@ source("~/.postpass")
 drv <- dbDriver("PostgreSQL")
 con <- dbConnect(drv, dbname = dbname, host = host, port = port, user = user, password = password)
 
-levtidbes_cat <- dbGetQuery(con, "select distinct cat from datamart.accession_lev_tid_bes")
+levtidbes_cat <- dbGetQuery(con, "select distinct cat from datamart.accession_lev_tid_bes order by cat")
 levtidmat_vnd <- dbGetQuery(con, "select distinct vndcustomerid from datamart.accession_lev_tid_mat")
 
 dbDisconnect(con)
@@ -52,7 +52,7 @@ dashboardPage(
               ),
               column(12,
                 sliderInput("range", "Dage fra bestil til tilgængelig:", min = 0, max = 250, value = c(1,250))
-              )     
+              )
             )
           ),
           column(9,
@@ -122,16 +122,20 @@ dashboardPage(
                 selectInput("year", "År:", c("Alle" = "All", "2017" = "2017","2016" = "2016","2015" = "2015" ))
               ),
               column(12,
-                selectInput("cat", "Lånerkategori:", c("Alle" = "All", unique(as.character(levtidbes_cat$cat))))
+                selectInput("week", "Bestillingsuge:", c("Alle" = "All", 1:52))
+              ),
+              column(12,
+               selectInput("cat", "Lånerkategori:", c("Alle" = "All", unique(as.character(levtidbes_cat$cat))))
+              ), 
+              column(12,
+                tags$b("Resultater:"), textOutput("ordersresult")
               )
+              
             )
           ),
           column(9,
             box(width = 6,
               plotOutput("plotbes")
-            ),
-            box(width = 6,
-              plotOutput("plotbes2")
             ),
             box(width = 12,
               DT::dataTableOutput("tablebes")
